@@ -1,0 +1,7 @@
+/build/
+/dist/
+/tw2.fontawesome.egg-info/
+/tw2/fontawesome/metadata.py
+
+*.py?
+__pycache__/
