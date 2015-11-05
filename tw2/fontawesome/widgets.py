@@ -27,7 +27,7 @@ from tw2.core.params import Param
 from tw2.core import Widget
 
 from .resources import fontawesome_resources
-from .metadata import iconnames
+from .metadata import icons
 
 __all__ = ('FontAwesomeIcon')
 
@@ -76,7 +76,7 @@ class FontAwesomeIcon(Widget):
     def prepare(self):
         super(FontAwesomeIcon, self).prepare()
 
-        if self.icon not in iconnames:
+        if self.icon not in icons:
             raise ValueError("Invalid icon name: '{}'".format(self.icon))
 
         self.safe_modify('attrs')

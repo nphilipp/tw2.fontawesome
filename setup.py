@@ -8,10 +8,22 @@ from distutils import log
 
 import os
 import re
+if not hasattr(re, "ASCII"):
+    # Python 2.x, ASCII doesn't exist, but is default
+    re.ASCII = 0
 
 class generate_files_mixin(object):
 
     iconname_selector_re = re.compile(r"\.fa-(?P<name>[^ :]+):before")
+
+    icon_extractor_re = re.compile(
+            r"(?P<selectors>"
+                r"(?:\.fa-[\w-]+::?before\s*,\s*)*"
+                r"\.fa-[\w-]+::?before)"
+            r"""\s*{\s*content\s*:\s*"(?P<content>[^"]+)"\s*;\s*}""",
+            re.MULTILINE | re.DOTALL | re.ASCII)
+
+    icon_name_re = re.compile(r"\.fa-(?P<name>[\w-]+)::?before", re.ASCII)
 
     here = os.path.dirname(__file__)
 
@@ -28,28 +40,34 @@ class generate_files_mixin(object):
         csspath = paths['css']
         metadatapath = paths['metadata']
 
-        names = []
+        icons = {}
 
         with open(csspath, "r") as cssfile:
-            log.info("extracting icon names from CSS {}".format(csspath))
-            for l in cssfile:
-                for m in self.iconname_selector_re.finditer(l):
+            log.info("extracting icon information from CSS {}".format(csspath))
+            for m in self.icon_extractor_re.finditer(cssfile.read()):
+                if m:
+                    selectors, content = m.group('selectors', 'content')
+                for m in self.icon_name_re.finditer(selectors):
                     if m:
-                        names.append(m.group('name'))
+                        icons[m.group('name')] = content.replace("\\", "\\u")
 
         with open(metadatapath, "w") as metadatafile:
             # file header
             log.info("writing metadata file {}:".format(metadatapath))
             print(
                 "# -*- coding: utf-8 -*-\n"
-                "# This file is generated, do not edit\n", file=metadatafile)
+                "# This file is generated, do not edit\n"
+                "\n"
+                "from __future__ import unicode_literals\n", file=metadatafile)
 
-            # icon names
-            log.info(" - icon names")
-            print("iconnames = set([", file=metadatafile)
-            for name in sorted(names):
-                print("    \"{}\",".format(name), file=metadatafile)
-            print("])", file=metadatafile)
+            # icon mapping
+            log.info(" - icon mapping")
+            print("icons = {", file=metadatafile)
+            for name, content in ((x, icons[x]) for x in sorted(icons)):
+                print(
+                    """    "{}": "{}",""".format(name, content),
+                    file=metadatafile)
+            print("}", file=metadatafile)
 
 
 class my_build_py(build_py, generate_files_mixin):
