@@ -25,6 +25,9 @@ pkg_resources.require("tw2.core >= 2.0")
 
 from tw2.core.params import Param
 from tw2.core import Widget
+from tw2.core.core import request_local
+
+genshi_tag = None
 
 from .resources import fontawesome_resources
 from .metadata import icons
@@ -70,8 +73,22 @@ class FontAwesomeIcon(Widget):
             return ""
 
     def generate_output(self, displays_on):
-        return "<{tag}{attrs}></{tag}>".format(
-                tag=self.tag, attrs=self._render_attrs(self.attrs))
+        global genshi_tag
+
+        if not displays_on:
+            mw = request_local().get('middleware')
+            displays_on = self._get_default_displays_on(mw)
+
+        if displays_on == 'genshi':
+            if not genshi_tag:
+                import genshi.builder
+                genshi_tag = genshi.builder.tag
+            retval = getattr(genshi_tag, self.tag)(**self.attrs).generate()
+        else:
+            retval = "<{tag}{attrs}></{tag}>".format(
+                    tag=self.tag, attrs=self._render_attrs(self.attrs))
+
+        return retval
 
     def prepare(self):
         super(FontAwesomeIcon, self).prepare()
