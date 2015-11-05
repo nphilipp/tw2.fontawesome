@@ -93,15 +93,18 @@ class FontAwesomeIcon(Widget):
     def prepare(self):
         super(FontAwesomeIcon, self).prepare()
 
-        if self.icon not in icons:
+        if self.icon and self.icon not in icons:
             raise ValueError("Invalid icon name: '{}'".format(self.icon))
 
         self.safe_modify('attrs')
 
         if self.attrs.get('class'):
-            classes = [self.attrs['class'], 'fa', 'fa-' + self.icon]
+            classes = [self.attrs['class'], 'fa']
         else:
-            classes = ['fa', 'fa-' + self.icon]
+            classes = ['fa']
+
+        if self.icon:
+            classes.append("fa-" + self.icon)
 
         if self.fixed_width:
             classes.append('fa-fw')
