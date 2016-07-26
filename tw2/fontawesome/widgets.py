@@ -28,6 +28,7 @@ from tw2.core import Widget
 from tw2.core.core import request_local
 
 genshi_tag = None
+kajiki_literal = None
 
 from .resources import fontawesome_resources
 from .metadata import icons
@@ -87,6 +88,12 @@ class FontAwesomeIcon(Widget):
         else:
             retval = "<{tag}{attrs}></{tag}>".format(
                     tag=self.tag, attrs=self._render_attrs(self.attrs))
+            if displays_on == 'kajiki':
+                global kajiki_literal
+                if not kajiki_literal:
+                    import kajiki.util
+                    kajiki_literal = kajiki.util.literal
+                retval = kajiki_literal(retval)
 
         return retval
 
