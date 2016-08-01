@@ -34,7 +34,7 @@ from . import config
 
 
 __all__ = ('FontAwesomeCSSLink')
-    
+
 
 class AltLinkError(Exception):
     pass
@@ -172,7 +172,7 @@ class FontAwesomeCSSLink(CSSLink, FontAwesomeLinkMixin):
 class FontAwesomeFontsDirLink(DirLink, FontAwesomeLinkMixin):
 
     filename = "static/fonts"
-    
+
 
 fontawesome_css = FontAwesomeCSSLink()
 fontawesome_fonts = FontAwesomeFontsDirLink()
