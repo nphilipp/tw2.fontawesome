@@ -99,7 +99,7 @@ class my_develop(develop, generate_files_mixin):
 
 setup(
     name="tw2.fontawesome",
-    version="0.1",
+    version="4.7.0",
     description="ToscaWidgets 2 wrapper for FontAwesome",
     author="Nils Philippsen",
     author_email="nils@tiptoe.de",
